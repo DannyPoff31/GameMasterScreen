@@ -10,6 +10,9 @@ title: HW4 – Team Project Rubric
 
 ### Sprint 1 Summary
 
+Loc: 378
+Requirements: 1/7 - 14%
+
 - week 1: busy
 - week 2: started working on clock
 - week 3: continued working on clock
