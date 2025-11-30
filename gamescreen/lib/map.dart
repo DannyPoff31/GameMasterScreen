@@ -8,9 +8,9 @@ class map extends StatelessWidget {
   final double? width;
   final ValueNotifier<List<Sketch>> allSketches;
   
-  final ValueNotifier<List<Room>> rooms;
+  final List<Room> rooms;
 
-  void Function(BuildContext, String, String, ValueNotifier<List<dynamic>>) callback;
+  void Function(BuildContext, String, String, List) callback;
 
   map({
     required this.height,
@@ -24,17 +24,17 @@ class map extends StatelessWidget {
   Widget build(BuildContext context) {
     return Listener(
       onPointerDown: (event) {
-        for(int i = 0; i < rooms.value.length; i++) {
-          double startx = rooms.value[i].startpoint.dx;
-          double endx = rooms.value[i].endpoint.dx;
-          double starty = rooms.value[i].startpoint.dy;
-          double endy = rooms.value[i].endpoint.dy;
+        for(int i = 0; i < rooms.length; i++) {
+          double startx = rooms[i].startpoint.dx;
+          double endx = rooms[i].endpoint.dx;
+          double starty = rooms[i].startpoint.dy;
+          double endy = rooms[i].endpoint.dy;
           final box = context.findRenderObject() as RenderBox;
           final offset = box.globalToLocal(event.position);
 
           if(offset.dx < endx && offset.dx > startx && offset.dy < endy && offset.dy > starty) {
-            print(rooms.value[i].name);
-            callback(context, 'Hello', rooms.value[i].name, rooms);
+            print(rooms[i].name);
+            callback(context, 'Hello', rooms[i].name, rooms);
           } 
         }
         if(event.position.dx < 40 && event.position.dy-height! < 40) {

@@ -49,9 +49,9 @@ class MyHomePage extends StatefulWidget {
 
 
 class _MyHomePageState extends State<MyHomePage> {
-  ValueNotifier<List<dynamic>> players = ValueNotifier<List<dynamic>>([]);
-  ValueNotifier<List<dynamic>> npc = ValueNotifier<List<dynamic>>([]);
-  ValueNotifier<List<dynamic>> npcFrame = ValueNotifier<List<dynamic>>([]);
+  List players = [['Steve', 'Hello', 'Steve']];
+  List npc = [];
+  List npcFrame = [];
   bool clockState = false;
   int sec = 0;
   int min = 0;
@@ -251,15 +251,61 @@ Widget _editTitleTextField() {
   final List<TextEditingController> _variableControllers = [];
   final List<TextEditingController> _contentControllers = [];
 
-  void _createDialog(BuildContext context, String subtitle, String name, ValueNotifier<List<dynamic>> itemList) {
+  Widget _modularTextField() {
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Row(
+          children: [
+            Container(
+              height: 300,
+              width: 300,
+              child: SingleChildScrollView(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _variableControllers.length,
+                  itemBuilder: (context, index) {
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _variableControllers[index],
+                            decoration: const InputDecoration(hintText: 'Variable'),
+                          ),
+                        ),
+                        Expanded(
+                          child: TextField(
+                            controller: _contentControllers[index],
+                            decoration: const InputDecoration(hintText: 'Content'),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  _variableControllers.add(TextEditingController());
+                  _contentControllers.add(TextEditingController());
+                });
+              },
+              child: const Icon(Icons.add),
+            ),
+          ],
+        );
+      }
+    );
+  }
+
+  void _createDialog(BuildContext context, String subtitle, String name, List itemList) {
     TextEditingController _nameController = TextEditingController();
     late List submit;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
             return AlertDialog(
               title: Text('Enter ${name} Name'),
               content: Column( 
@@ -268,43 +314,7 @@ Widget _editTitleTextField() {
                     controller: _nameController,
                     decoration: const InputDecoration(hintText: 'Name'),
                   ),
-                  Container(
-                    height: 300,
-                    width: 300,
-                    child: SingleChildScrollView(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: _variableControllers.length,
-                        itemBuilder: (context, index) {
-                          return Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: _variableControllers[index],
-                                  decoration: const InputDecoration(hintText: 'Variable'),
-                                ),
-                              ),
-                              Expanded(
-                                child: TextField(
-                                  controller: _contentControllers[index],
-                                  decoration: const InputDecoration(hintText: 'Content'),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  FloatingActionButton(
-                    onPressed: () {
-                      setState(() {
-                        _variableControllers.add(TextEditingController());
-                        _contentControllers.add(TextEditingController());
-                      });
-                    },
-                    child: const Icon(Icons.add),
-                  ),
+                  _modularTextField(),
                 ],
               ),
               actions: <Widget>[
@@ -322,17 +332,19 @@ Widget _editTitleTextField() {
                       submit.add(_variableControllers[i].text);
                       submit.add(_contentControllers[i].text);
                     }
-                    itemList.value.add(submit);
+                    // Access the input value from _textController.text
+                    itemList.add(submit);
                     print('Submitted text: $submit');
                     Navigator.of(context).pop(); // Close the dialog
+                    setState(() {
+                      
+                    });
                   },
                 ),
               ],
             );
           }
         );
-      },
-    );
   }
 
   void _timeDialog(BuildContext context) {
@@ -436,7 +448,7 @@ Widget _editTitleTextField() {
             TextButton(
               child: const Text('Submit'),
               onPressed: () {
-                players.value[index][0] = _nameController.text;
+                players[index][0] = _nameController.text;
                 Navigator.of(context).pop(); // Close the dialog
                 setState(() {
                   
@@ -469,9 +481,9 @@ Widget _npcFrameBox({required info, required index}) {
             subtitle: Text('${info[1]}'),
           )
         ),
-        Flexible(
+        Flexible( 
           child: IconButton(
-            onPressed: () => _createDialog(context, npcFrame.value[index][0], 'NPC', npc),
+            onPressed: () => _createDialog(context, npcFrame[index][0], 'NPC', npc),
             icon: const Icon(Icons.add_circle_outline)
           )
         ),
@@ -486,7 +498,7 @@ Widget _npcFrameBox({required info, required index}) {
               child: const Text('Delete'),
               onPressed: () {
                 setState(() {
-                  npcFrame.value.removeAt(index);
+                  npcFrame.removeAt(index);
                 });
               },)
           ],
@@ -527,7 +539,7 @@ Widget _npcBox({required info, required index}) {
               child: const Text('Delete'),
               onPressed: () {
                 setState(() {
-                  npc.value.removeAt(index);
+                  npc.removeAt(index);
                 });
               },)
           ],
@@ -576,7 +588,7 @@ Widget _characterBox({required info, required index, required bool orientedLeft}
               child: const Text('Delete'),
               onPressed: () {
                 setState(() {
-                  players.value.removeAt(index);
+                  players.removeAt(index);
                 });
               },)
           ],
@@ -591,12 +603,12 @@ ValueNotifier<List<Sketch>> allSketches = ValueNotifier<List<Sketch>>([Sketch(po
 ValueNotifier<Sketch> currentSketch = ValueNotifier<Sketch>(Sketch(points: []));
 double? height = MediaQuery.of(context).size.height * .8;
 double? width = MediaQuery.of(context).size.width;
-ValueNotifier<List<Room>> rooms = ValueNotifier([ 
+List<Room> rooms = [ 
   Room(startpoint: Offset(10,10), endpoint: Offset(20,20), name: 'Room1'),
   Room(startpoint: Offset(40,40), endpoint: Offset(80,80), name: 'Room2'),
-]);
+];
 
-rooms.value.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), name:'Room3'));
+rooms.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), name:'Room3'));
 
 // MAIN PAGE !!!
     return Scaffold(
@@ -646,9 +658,9 @@ rooms.value.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), nam
                     Expanded(
                       child: ListView.builder(
                         shrinkWrap: true,
-                        itemCount: players.value.length,
+                        itemCount: players.length,
                         itemBuilder: (BuildContext context, int position) {
-                            return _characterBox(info: players.value[position] ?? '', index: position, orientedLeft: false);
+                            return _characterBox(info: players[position] ?? '', index: position, orientedLeft: false);
                         }
                       ),
                     ),
@@ -764,9 +776,9 @@ rooms.value.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), nam
                             SliverToBoxAdapter(
                               child: ListView.builder(
                                 shrinkWrap: true,
-                                itemCount: npcFrame.value.length,
+                                itemCount: npcFrame.length,
                                 itemBuilder: (BuildContext context, int position) {
-                                    return _npcFrameBox(info: npcFrame.value[position] ?? '', index: position);
+                                    return _npcFrameBox(info: npcFrame[position] ?? '', index: position);
                                 }
                               ),
                             ),
@@ -804,9 +816,9 @@ rooms.value.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), nam
                     Flexible(
                       child: ListView.builder(
                         shrinkWrap: true,
-                        itemCount: npc.value.length,
+                        itemCount: npc.length,
                         itemBuilder: (BuildContext context, int position) {
-                            return _npcBox(info: npc.value[position] ?? '', index: position);
+                            return _npcBox(info: npc[position] ?? '', index: position);
                         }
                       ),
                     ),

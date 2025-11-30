@@ -5,7 +5,7 @@ import 'drawingTools/room.dart';
 class mapDrawer extends CustomPainter {
   final List<Sketch> sketches;
   final String mode;
-  ValueNotifier<List<Room>> rooms;
+  List<Room> rooms;
 
   mapDrawer({
     required this.sketches,
@@ -77,7 +77,7 @@ class mapDrawingBoard extends StatelessWidget {
 
   final ValueNotifier<Sketch?> currentSketch;
   final ValueNotifier<List<Sketch>> allSketches;
-  final ValueNotifier<List<Room>> rooms;
+  final List<Room> rooms;
 
   const mapDrawingBoard({
     Key? key,
@@ -143,7 +143,7 @@ class mapDrawingBoard extends StatelessWidget {
 
         allSketches.value = List<Sketch>.from(allSketches.value)
           ..add(currentSketch.value!);
-          rooms.value.add(Room(startpoint: Offset(start.dx, start.dy), endpoint: Offset(offset.dx, offset.dy), name: 'ROOM!'));
+          rooms.add(Room(startpoint: Offset(start.dx, start.dy), endpoint: Offset(offset.dx, offset.dy), name: 'ROOM!'));
           print('Room Added');
       },  
       child: RepaintBoundary(
