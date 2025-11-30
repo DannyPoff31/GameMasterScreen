@@ -21,8 +21,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 45, 40, 55)),
+        scaffoldBackgroundColor: Color.fromARGB(255, 45, 40, 55),
+        fontFamily: 'DigitalDream',
+        textTheme: Theme.of(context).textTheme.apply(
+          bodyColor: Colors.green,
+          displayColor: Colors.green,
+        ),
       ),
       home: const MyHomePage(delay: delay, title: 'Flutter Demo Home Page'),
     );
@@ -42,9 +49,9 @@ class MyHomePage extends StatefulWidget {
 
 
 class _MyHomePageState extends State<MyHomePage> {
-  List players = [];
-  List npc = [];
-  List npcFrame = [];
+  ValueNotifier<List<dynamic>> players = ValueNotifier<List<dynamic>>([]);
+  ValueNotifier<List<dynamic>> npc = ValueNotifier<List<dynamic>>([]);
+  ValueNotifier<List<dynamic>> npcFrame = ValueNotifier<List<dynamic>>([]);
   bool clockState = false;
   int sec = 0;
   int min = 0;
@@ -191,52 +198,138 @@ Widget _editTitleTextField() {
     );
   }
 
-  void _createDialog(BuildContext context, String subtitle, String name, List itemList) {
+//  void _createDialog(BuildContext context, String subtitle, String name, List itemList) {
+//     TextEditingController _nameController = TextEditingController();
+//     TextEditingController _healthController = TextEditingController();
+//     late List submit;
+
+//     showDialog(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return AlertDialog(
+//           title: Text('Enter ${name} Name'),
+//           content: SingleChildScrollView(
+//             child: Column( 
+//               children: <Widget> [
+//                 TextField(
+//                   controller: _nameController,
+//                   decoration: const InputDecoration(hintText: 'Name'),
+//                 ),
+//                 TextField(
+//                   controller: _healthController,
+//                   decoration: const InputDecoration(hintText: 'Health'),
+//                 )
+//               ],
+//             )
+
+//           ),
+//           actions: <Widget>[
+//             TextButton(
+//               child: const Text('Cancel'),
+//               onPressed: () {
+//                 Navigator.of(context).pop(); // Close the dialog
+//               },
+//             ),
+//             TextButton(
+//               child: const Text('Submit'),
+//               onPressed: () {
+//                 List submit = [_nameController.text, subtitle, _healthController.text];
+//                 // Access the input value from _textController.text
+//                 itemList.add(submit);
+//                 print('Submitted text: $submit');
+//                 Navigator.of(context).pop(); // Close the dialog
+//                 setState(() {
+                  
+//                 });
+//               },
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//   }
+  final List<TextEditingController> _variableControllers = [];
+  final List<TextEditingController> _contentControllers = [];
+
+  void _createDialog(BuildContext context, String subtitle, String name, ValueNotifier<List<dynamic>> itemList) {
     TextEditingController _nameController = TextEditingController();
-    TextEditingController _healthController = TextEditingController();
     late List submit;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Enter ${name} Name'),
-          content: SingleChildScrollView(
-            child: Column( 
-              children: <Widget> [
-                TextField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(hintText: 'Name'),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Enter ${name} Name'),
+              content: Column( 
+                children: <Widget> [
+                  TextField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(hintText: 'Name'),
+                  ),
+                  Container(
+                    height: 300,
+                    width: 300,
+                    child: SingleChildScrollView(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: _variableControllers.length,
+                        itemBuilder: (context, index) {
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _variableControllers[index],
+                                  decoration: const InputDecoration(hintText: 'Variable'),
+                                ),
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  controller: _contentControllers[index],
+                                  decoration: const InputDecoration(hintText: 'Content'),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  FloatingActionButton(
+                    onPressed: () {
+                      setState(() {
+                        _variableControllers.add(TextEditingController());
+                        _contentControllers.add(TextEditingController());
+                      });
+                    },
+                    child: const Icon(Icons.add),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
                 ),
-                TextField(
-                  controller: _healthController,
-                  decoration: const InputDecoration(hintText: 'Health'),
-                )
+                TextButton(
+                  child: const Text('Submit'),
+                  onPressed: () {
+                    List submit = [_nameController.text, subtitle];
+                    for(int i = 0; i < _variableControllers.length; i++) {
+                      submit.add(_variableControllers[i].text);
+                      submit.add(_contentControllers[i].text);
+                    }
+                    itemList.value.add(submit);
+                    print('Submitted text: $submit');
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                ),
               ],
-            )
-
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: const Text('Submit'),
-              onPressed: () {
-                List submit = [_nameController.text, subtitle, _healthController.text];
-                // Access the input value from _textController.text
-                itemList.add(submit);
-                print('Submitted text: $submit');
-                Navigator.of(context).pop(); // Close the dialog
-                setState(() {
-                  
-                });
-              },
-            ),
-          ],
+            );
+          }
         );
       },
     );
@@ -343,7 +436,7 @@ Widget _editTitleTextField() {
             TextButton(
               child: const Text('Submit'),
               onPressed: () {
-                players[index][0] = _nameController.text;
+                players.value[index][0] = _nameController.text;
                 Navigator.of(context).pop(); // Close the dialog
                 setState(() {
                   
@@ -376,9 +469,9 @@ Widget _npcFrameBox({required info, required index}) {
             subtitle: Text('${info[1]}'),
           )
         ),
-        Flexible( 
+        Flexible(
           child: IconButton(
-            onPressed: () => _createDialog(context, npcFrame[index][0], 'NPC', npc),
+            onPressed: () => _createDialog(context, npcFrame.value[index][0], 'NPC', npc),
             icon: const Icon(Icons.add_circle_outline)
           )
         ),
@@ -393,7 +486,7 @@ Widget _npcFrameBox({required info, required index}) {
               child: const Text('Delete'),
               onPressed: () {
                 setState(() {
-                  npcFrame.removeAt(index);
+                  npcFrame.value.removeAt(index);
                 });
               },)
           ],
@@ -434,7 +527,7 @@ Widget _npcBox({required info, required index}) {
               child: const Text('Delete'),
               onPressed: () {
                 setState(() {
-                  npc.removeAt(index);
+                  npc.value.removeAt(index);
                 });
               },)
           ],
@@ -483,7 +576,7 @@ Widget _characterBox({required info, required index, required bool orientedLeft}
               child: const Text('Delete'),
               onPressed: () {
                 setState(() {
-                  players.removeAt(index);
+                  players.value.removeAt(index);
                 });
               },)
           ],
@@ -494,192 +587,235 @@ Widget _characterBox({required info, required index, required bool orientedLeft}
 }
 
 
-ValueNotifier<List<Sketch>> allSketches = ValueNotifier<List<Sketch>>([Sketch(points:[Offset(0, 0), Offset(5, 5), Offset(10, 10)]), Sketch(points:[Offset(20, 20), Offset(60, 60), Offset(80, 80)]),]);
+ValueNotifier<List<Sketch>> allSketches = ValueNotifier<List<Sketch>>([Sketch(points:[Offset(10, 10), Offset(15, 15), Offset(20, 20)]), Sketch(points:[Offset(40, 40), Offset(60, 60), Offset(80, 80)]), Sketch(points:[Offset(20, 100), Offset(21, 101), Offset(60, 120)])]);
 ValueNotifier<Sketch> currentSketch = ValueNotifier<Sketch>(Sketch(points: []));
-double? height = MediaQuery.of(context).size.height;
+double? height = MediaQuery.of(context).size.height * .8;
 double? width = MediaQuery.of(context).size.width;
-List<Room> rooms = [ 
-  Room(startpoint: Offset(0,0), endpoint: Offset(10,10), name: 'Room1'),
-  Room(startpoint: Offset(20,20), endpoint: Offset(80,80), name: 'Room2'),
-];
+ValueNotifier<List<Room>> rooms = ValueNotifier([ 
+  Room(startpoint: Offset(10,10), endpoint: Offset(20,20), name: 'Room1'),
+  Room(startpoint: Offset(40,40), endpoint: Offset(80,80), name: 'Room2'),
+]);
 
-rooms.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), name:'Room3'));
+rooms.value.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), name:'Room3'));
 
 // MAIN PAGE !!!
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text('Hello'),
+        backgroundColor: Color.fromARGB(255, 45, 40, 55),
+        
+        title: Text('Gamemaster Screen', style: TextStyle(
+          color: Colors.green,
+        )),
+      ),
+      drawer: Drawer(
+        child: Column(
+          children: [ Container(
+                    //constraints: BoxConstraints(minWidth: 100, maxWidth: 200),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                      borderRadius: BorderRadius.only(bottomRight: Radius.circular(10)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withValues(alpha: 0.75),
+                          spreadRadius: 1,
+                          blurRadius:  .5,
+                          offset: Offset(.5, 1), // changes position of shadow
+                        )
+                      ],
+                    ),
+                    child: Row( 
+                      children: [ 
+                        Expanded(
+                          flex: 2,
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 10),
+                            child: Text('Player Characters')
+                          )
+                        ),
+                        Expanded(
+                          flex: 2, 
+                          child: ElevatedButton(
+                            onPressed: () {_createDialog(context,'Hello','Hello',players);},
+                              child: const Text('Create Player'),
+                            ),
+                          ),                        
+                      ],
+                      )
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: players.value.length,
+                        itemBuilder: (BuildContext context, int position) {
+                            return _characterBox(info: players.value[position] ?? '', index: position, orientedLeft: false);
+                        }
+                      ),
+                    ),
+          ]
+        ),
       ),
 
-      body: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [ 
-          // Row 1
-          Flexible(
-             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  //constraints: BoxConstraints(minWidth: 100, maxWidth: 200),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.inversePrimary,
-                    borderRadius: BorderRadius.only(bottomRight: Radius.circular(10)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withValues(alpha: 0.75),
-                        spreadRadius: 1,
-                        blurRadius:  .5,
-                        offset: Offset(.5, 1), // changes position of shadow
-                      )
-                    ],
-                  ),
-                  child: Row( 
-                    children: [ 
-                      Align(
-                        
-                        alignment: Alignment.topLeft,
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 10),
-                          child: Text('Player Characters')
-                        )
+      body: Column(
+        children: [
+          Expanded(
+            flex: 8,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [ 
+                // Row 1
+                Expanded(
+                  flex: 7,
+                   child: Padding(
+                      padding: EdgeInsetsGeometry.all(8),
+                      child: Stack(
+                        children: <Widget>[
+                          map(
+                            height: height, 
+                            width: width,
+                            rooms: rooms,
+                            allSketches: allSketches,
+                            callback: _createDialog,
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: ElevatedButton(onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder: (context) => mapDrawingBoard(
+                                      height: height, 
+                                      width: width,
+                                      currentSketch: currentSketch,
+                                      allSketches: allSketches,
+                                      rooms: rooms,
+                                    ),
+                                  ),
+                                );
+                              }, child: Text('Room Page')),
+                            ),
+                          ),
+                        ]
                       ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: ElevatedButton(
-                          onPressed: () => _createDialog(context,'','',players),
-                            child: const Text('Open Input Dialog'),
-                          )
-                        )
-                      ]
-                    )
-                  ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: players.length,
-                    itemBuilder: (BuildContext context, int position) {
-                        return _characterBox(info: players[position] ?? '', index: position, orientedLeft: false);
-                    }
-                  ),
+                   ),
                 ),
-                Expanded(
-                  child: map(
-                    height: height, 
-                    width: width,
-                    rooms: rooms,
-                    allSketches: allSketches,
-                    callback: _createDialog,
+            
+                //Row 2
+                
+                Flexible( 
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0, bottom: 8.0, top: 8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(12),
+                        border: BoxBorder.all(
+                          color: Colors.green,
+                        ),
+                      ),
+                      
+                      child: CustomScrollView(
+                        slivers: [
+                          SliverToBoxAdapter(
+                            child: Clock(timeStream: _clockStream),
+                          ),
+                          SliverToBoxAdapter(
+                            child: Row(
+                              children: [
+                                TextButton(
+                                  child: const Text('Edit'),
+                                  onPressed: () {
+                                    _timeDialog(context);
+                                  },),
+                                  TextButton(
+                                  child: const Text('Start'),
+                                  onPressed: () {
+                                    if(!clockState) {
+                                      clockState = true;
+                                    }
+                                    else {
+                                      clockState = false;
+                                    }
+                                  },),
+                              ],
+                            ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 10),
+                                child: Text('Monster Types')
+                              )
+                            ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: Align(
+                            alignment: Alignment.topRight,
+                            child: ElevatedButton(
+                              onPressed: () => _createDialog(context,'','',npcFrame),
+                                child: const Text('Open Input Dialog'),
+                              )
+                            )
+                          ),
+                            SliverToBoxAdapter(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: npcFrame.value.length,
+                                itemBuilder: (BuildContext context, int position) {
+                                    return _npcFrameBox(info: npcFrame.value[position] ?? '', index: position);
+                                }
+                              ),
+                            ),
+                          ],
+                        ),
+                    ),
                   )
-                ),
-                // Expanded(child: mapDrawingBoard(
-                //   height: MediaQuery.of(context).size.height, 
-                //   width: MediaQuery.of(context).size.width,
-                //   currentSketch: currentSketch,
-                //   allSketches: allSketches,
-                // ),)
-              ]
+                  ),
+              ],
             ),
           ),
 
-          //Row 2
-          
-          Flexible( 
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                   child: ElevatedButton(onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (context) => mapDrawingBoard(
-                          height: height, 
-                          width: width,
-                          currentSketch: currentSketch,
-                          allSketches: allSketches,
-                          rooms: rooms,
-                        ),
-                      ),
-                    );
-                  }, child: Text('Create a Room'))
-                ),
-                SliverToBoxAdapter(
-                  child: const Text('Time:'),
-                ),
-                SliverToBoxAdapter(
-                  child: Clock(timeStream: _clockStream),
-                ),
-                SliverToBoxAdapter(
-                  child: TextButton(
-                    child: const Text('Edit'),
-                    onPressed: () {
-                      _timeDialog(context);
-                    },),
-                ),
-                SliverToBoxAdapter(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 10),
-                      child: Text('Instantiated Monsters')
-                    )
-                  ),
-                ),
-                SliverToBoxAdapter(
-                    child: Expanded(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: npc.length,
-                        itemBuilder: (BuildContext context, int position) {
-                            return _npcBox(info: npc[position] ?? '', index: position);
-                        }
-                      ),
-                    ),
-                  ),
-                SliverToBoxAdapter(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 10),
-                      child: Text('Monster Types')
-                    )
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: Align(
-                  alignment: Alignment.topRight,
-                  child: ElevatedButton(
-                    onPressed: () => _createDialog(context,'','',npcFrame),
-                      child: const Text('Open Input Dialog'),
-                    )
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(12),
+                  border: BoxBorder.all(
+                    color: Colors.green,
                   )
+              
                 ),
-                  SliverToBoxAdapter(
-                    child: Expanded(
+                child: Row(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Text('Instantiated Monsters')
+                      )
+                    ),
+                    Flexible(
                       child: ListView.builder(
                         shrinkWrap: true,
-                        itemCount: npcFrame.length,
+                        itemCount: npc.value.length,
                         itemBuilder: (BuildContext context, int position) {
-                            return _npcFrameBox(info: npcFrame[position] ?? '', index: position);
+                            return _npcBox(info: npc.value[position] ?? '', index: position);
                         }
                       ),
                     ),
-                  ),
-                ],
-              )
+                  ],
+                ),
+              ),
             ),
+          ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if(!clockState) {
-            clockState = true;
-          }
-          else {
-            clockState = false;
-          }
-        },
-        tooltip: 'Start',
-        child: const Icon(Icons.add),
       ),
     );
   }

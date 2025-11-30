@@ -8,7 +8,7 @@ class Sketch {
   Sketch({
     required this.points,
     this.color = Colors.black,
-    this.size = 5
+    this.size = 2
   });
 
 }

@@ -8,9 +8,9 @@ class map extends StatelessWidget {
   final double? width;
   final ValueNotifier<List<Sketch>> allSketches;
   
-  final List<Room> rooms;
+  final ValueNotifier<List<Room>> rooms;
 
-  void Function(BuildContext, String, String, List) callback;
+  void Function(BuildContext, String, String, ValueNotifier<List<dynamic>>) callback;
 
   map({
     required this.height,
@@ -24,37 +24,46 @@ class map extends StatelessWidget {
   Widget build(BuildContext context) {
     return Listener(
       onPointerDown: (event) {
-        for(int i = 0; i < rooms.length; i++) {
-          double startx = rooms[i].startpoint.dx;
-          double endx = rooms[i].endpoint.dx;
-          double starty = rooms[i].startpoint.dy;
-          double endy = rooms[i].endpoint.dy;
+        for(int i = 0; i < rooms.value.length; i++) {
+          double startx = rooms.value[i].startpoint.dx;
+          double endx = rooms.value[i].endpoint.dx;
+          double starty = rooms.value[i].startpoint.dy;
+          double endy = rooms.value[i].endpoint.dy;
           final box = context.findRenderObject() as RenderBox;
           final offset = box.globalToLocal(event.position);
 
           if(offset.dx < endx && offset.dx > startx && offset.dy < endy && offset.dy > starty) {
-            print(rooms[i].name);
-            callback(context, 'Hello', 'Room', rooms);
+            print(rooms.value[i].name);
+            callback(context, 'Hello', rooms.value[i].name, rooms);
           } 
         }
         if(event.position.dx < 40 && event.position.dy-height! < 40) {
-          print('CLick');
+          print('Click');
         }
       },
       child: SizedBox(
           height: height,
           width: width,
           // Rebuild the CustomPaint whenever the list of sketches changes
-          child: ValueListenableBuilder<List<Sketch>>(
-            valueListenable: allSketches,
-            builder: (context, sketchesValue, _) {
-              return CustomPaint(
-                painter: mapDrawer(
-                  sketches: sketchesValue,
-                  rooms: rooms,
-                ),
-              );
-            },
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(12),
+              border: BoxBorder.all(
+                color: Colors.green,
+              )
+            ),
+            child: ValueListenableBuilder<List<Sketch>>(
+              valueListenable: allSketches,
+              builder: (context, sketchesValue, _) {
+                return CustomPaint(
+                  painter: mapDrawer(
+                    sketches: sketchesValue,
+                    rooms: rooms,
+                  ),
+                );
+              },
+            ),
           ),
         ),
     );
