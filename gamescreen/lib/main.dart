@@ -49,9 +49,9 @@ class MyHomePage extends StatefulWidget {
 
 
 class _MyHomePageState extends State<MyHomePage> {
-  List players = [['Steve', 'Hello', 'Steve']];
-  List npc = [];
-  List npcFrame = [];
+  List<List> players = [];
+  List<List> npc = [];
+  List<List> npcFrame = [];
   bool clockState = false;
   int sec = 0;
   int min = 0;
@@ -104,194 +104,70 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
 
-    void startListening() {
-    subscription = _controller.stream.listen(
-      (data) => print('Received: $data'),
-      onError: (error) => print('Error: $error'),
-      onDone: () => print('Stream done'),
-    );
-  } 
-
-  bool _isEditingText = false;
-  var _editingController = TextEditingController();
-  String initialText = "Initial Text";
-
-Widget _editTitleTextField() {
-  if (_isEditingText) {
-    return Center(
-      child: TextField(
-        onSubmitted: (newValue){
-          setState(() {
-            initialText = newValue;
-            _isEditingText = false;
-          });
-        },
-        autofocus: true,
-        controller: _editingController,
-      ),
-    );
-  }
-  return InkWell(
-    onTap: () {
-      setState(() {
-        _isEditingText = true;
-      });
-    },
-    child: Text(
-  initialText,
-  style: TextStyle(
-    color: Colors.black,
-    fontSize: 18.0,
-  ),
-  )
-  );
-}
-
-  void _showInputDialog(BuildContext context, List type, String subtitle) {
-    TextEditingController _nameController = TextEditingController();
-    TextEditingController _healthController = TextEditingController();
-    late List submit;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Enter Player'),
-          content: SingleChildScrollView(
-            child: Column( 
-              children: <Widget> [
-                TextField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(hintText: 'Name'),
-                ),
-                TextField(
-                  controller: _healthController,
-                  decoration: const InputDecoration(hintText: 'Health'),
-                )
-              ],
-            )
-
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: const Text('Submit'),
-              onPressed: () {
-                List submit = [_nameController.text, subtitle, _healthController.text];
-                // Access the input value from _textController.text
-                type.add(submit);
-                print('Submitted text: $submit');
-                Navigator.of(context).pop(); // Close the dialog
-                setState(() {
-                  
-                });
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-//  void _createDialog(BuildContext context, String subtitle, String name, List itemList) {
-//     TextEditingController _nameController = TextEditingController();
-//     TextEditingController _healthController = TextEditingController();
-//     late List submit;
-
-//     showDialog(
-//       context: context,
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           title: Text('Enter ${name} Name'),
-//           content: SingleChildScrollView(
-//             child: Column( 
-//               children: <Widget> [
-//                 TextField(
-//                   controller: _nameController,
-//                   decoration: const InputDecoration(hintText: 'Name'),
-//                 ),
-//                 TextField(
-//                   controller: _healthController,
-//                   decoration: const InputDecoration(hintText: 'Health'),
-//                 )
-//               ],
-//             )
-
-//           ),
-//           actions: <Widget>[
-//             TextButton(
-//               child: const Text('Cancel'),
-//               onPressed: () {
-//                 Navigator.of(context).pop(); // Close the dialog
-//               },
-//             ),
-//             TextButton(
-//               child: const Text('Submit'),
-//               onPressed: () {
-//                 List submit = [_nameController.text, subtitle, _healthController.text];
-//                 // Access the input value from _textController.text
-//                 itemList.add(submit);
-//                 print('Submitted text: $submit');
-//                 Navigator.of(context).pop(); // Close the dialog
-//                 setState(() {
-                  
-//                 });
-//               },
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//   }
-  final List<TextEditingController> _variableControllers = [];
-  final List<TextEditingController> _contentControllers = [];
+final List<TextEditingController> _variableControllers = [];
+final List<TextEditingController> _contentControllers = [];
 
   Widget _modularTextField() {
+
     return StatefulBuilder(
       builder: (context, setState) {
-        return Row(
+        return Column(
           children: [
             Container(
-              height: 300,
-              width: 300,
+              height: MediaQuery.of(context).size.height * .5,
+              width: MediaQuery.of(context).size.width * .25,
               child: SingleChildScrollView(
                 child: ListView.builder(
                   shrinkWrap: true,
                   itemCount: _variableControllers.length,
                   itemBuilder: (context, index) {
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _variableControllers[index],
-                            decoration: const InputDecoration(hintText: 'Variable'),
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _variableControllers[index],
+                              decoration: InputDecoration(hintText: 'Variable'),
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: TextField(
-                            controller: _contentControllers[index],
-                            decoration: const InputDecoration(hintText: 'Content'),
+                          Expanded(
+                            child: TextField(
+                              controller: _contentControllers[index],
+                              decoration: InputDecoration(hintText: 'Content'),
+                            ),
                           ),
-                        ),
-                      ],
-                    );
+                        ],
+                      );                 
                   },
                 ),
               ),
             ),
-            FloatingActionButton(
-              onPressed: () {
-                setState(() {
-                  _variableControllers.add(TextEditingController());
-                  _contentControllers.add(TextEditingController());
-                });
-              },
-              child: const Icon(Icons.add),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      setState(() {
+                        if(_variableControllers.isNotEmpty) {
+                          _variableControllers.removeLast();
+                          _contentControllers.removeLast();
+                        }
+                      });
+                    },
+                    child: const Icon(Icons.remove),
+                  ),
+                ),
+                FloatingActionButton(
+                  onPressed: () {
+                    setState(() {
+                      _variableControllers.add(TextEditingController());
+                      _contentControllers.add(TextEditingController());
+                    });
+                  },
+                  child: const Icon(Icons.add),
+                ),
+              ],
             ),
           ],
         );
@@ -299,9 +175,83 @@ Widget _editTitleTextField() {
     );
   }
 
-  void _createDialog(BuildContext context, String subtitle, String name, List itemList) {
+  final List<TextEditingController> _editControllers = [];
+  Widget _modularEditField(List item) {
+    for(int i = 0; i < item.length; i++) {
+      _editControllers.add(TextEditingController());
+    }
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Column(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height * .5,
+              width: MediaQuery.of(context).size.width * .25,
+              child: SingleChildScrollView(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _editControllers.length,
+                  itemBuilder: (context, index) {
+                    if(index.isOdd) {
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _editControllers[index],
+                              decoration: InputDecoration(hintText: item[index]),
+                            ),
+                          ),
+                          Expanded(
+                            child: TextField(
+                              controller: _editControllers[index+1],
+                              decoration: InputDecoration(hintText: item[index+1]),
+                            ),
+                          ),
+                        ],
+                      );   
+                    }
+                    return SizedBox.shrink();              
+                  },
+                ),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      setState(() {
+                        if(_variableControllers.isNotEmpty) {
+                          _editControllers.removeLast();
+                          _editControllers.removeLast();
+                        }
+                      });
+                    },
+                    child: const Icon(Icons.remove),
+                  ),
+                ),
+                FloatingActionButton(
+                  onPressed: () {
+                    setState(() {
+                      _editControllers.add(TextEditingController());
+                      _editControllers.add(TextEditingController());
+                    });
+                  },
+                  child: const Icon(Icons.add),
+                ),
+              ],
+            ),
+          ],
+        );
+      }
+    );
+  }
+
+  void _createDialog(BuildContext context, String subtitle, String name, List itemSet) {
     TextEditingController _nameController = TextEditingController();
-    late List submit;
 
     showDialog(
       context: context,
@@ -327,13 +277,13 @@ Widget _editTitleTextField() {
                 TextButton(
                   child: const Text('Submit'),
                   onPressed: () {
-                    List submit = [_nameController.text, subtitle];
+                    List submit = ['${_nameController.text} - $subtitle',];
                     for(int i = 0; i < _variableControllers.length; i++) {
                       submit.add(_variableControllers[i].text);
                       submit.add(_contentControllers[i].text);
                     }
                     // Access the input value from _textController.text
-                    itemList.add(submit);
+                    itemSet.add(submit);
                     print('Submitted text: $submit');
                     Navigator.of(context).pop(); // Close the dialog
                     setState(() {
@@ -401,22 +351,8 @@ Widget _editTitleTextField() {
     );
   }
 
-// TextField builder?
-// ListView.builder(
-//   itemCount: _controllers.length,
-//   itemBuilder: (context, index) {
-//     return TextField(
-//       controller: _controllers[index],
-//       decoration: InputDecoration(labelText: 'Item ${index + 1}'),
-//     );
-//   },
-// );
-
-
-  void _playerEditDialog(BuildContext context, int index) {
+  void _editDialog(BuildContext context, List<List> itemSet, int index) {
     TextEditingController _nameController = TextEditingController();
-    TextEditingController _textController = TextEditingController();
-    //TextEditingController _hourController = TextEditingController();
 
     showDialog(
       context: context,
@@ -428,12 +364,9 @@ Widget _editTitleTextField() {
               children: <Widget> [
                 TextField(
                   controller: _nameController,
-                  decoration: const InputDecoration(hintText: 'name'),
+                  decoration: InputDecoration(hintText: '${itemSet[index][0]}'),
                 ),
-                TextField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(hintText: 'other'),
-                ),                
+                _modularEditField(itemSet[index]),              
               ],
             )
 
@@ -448,7 +381,13 @@ Widget _editTitleTextField() {
             TextButton(
               child: const Text('Submit'),
               onPressed: () {
-                players[index][0] = _nameController.text;
+                List submit = ['${_nameController.text}',];
+                for(int i = 0; i < _variableControllers.length; i++) {
+                  submit.add(_variableControllers[i].text);
+                  submit.add(_contentControllers[i].text);
+                }
+                // Access the input value from _textController.text
+                itemSet.add(submit);
                 Navigator.of(context).pop(); // Close the dialog
                 setState(() {
                   
@@ -461,140 +400,71 @@ Widget _editTitleTextField() {
     );
   }
 
-
-Widget _npcFrameBox({required info, required index}) {
-  return Card(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(20.0), // top-left
-        bottomLeft: Radius.circular(20.0), // bottom-left
-      ),
-    ),
-    child: Row(
-      
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Expanded( 
-          child: ListTile(
-            leading: Icon(Icons.person_2_outlined),
-            title: Text('${info[0]} | ${info[2]}'),
-            subtitle: Text('${info[1]}'),
-          )
-        ),
-        Flexible( 
-          child: IconButton(
-            onPressed: () => _createDialog(context, npcFrame[index][0], 'NPC', npc),
-            icon: const Icon(Icons.add_circle_outline)
-          )
-        ),
-        Row(
-          children: [
-            TextButton(
-              child: const Text('Edit'),
-              onPressed: () {
-                _playerEditDialog(context, index);
-              },),
-            TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                setState(() {
-                  npcFrame.removeAt(index);
-                });
-              },)
-          ],
-        )
-      ]
-    )
-  );
-}
-
-Widget _npcBox({required info, required index}) {
-
-  return Card(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(20.0), // top-left
-        bottomLeft: Radius.circular(20.0), // bottom-left
-      ), 
-    ),
-    child: Column(
-      
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        ListTile(
-          leading: Icon(Icons.person_2_outlined),
-          title: Text('${info[0]}'),
-          subtitle: Text('${info[1]}'),
-        ),
-        _editTitleTextField(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            TextButton(
-              child: const Text('Edit'),
-              onPressed: () {
-                /* ... */
-              },),
-              TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                setState(() {
-                  npc.removeAt(index);
-                });
-              },)
-          ],
-        )
-      ]
-    )
-  );
-}
-
-Widget _characterBox({required info, required index, required bool orientedLeft}) {
-  BorderRadius side;
-  if(orientedLeft) {
-    side = BorderRadius.only(
-      topLeft: Radius.circular(20.0), // top-left
-      bottomLeft: Radius.circular(20.0), // bottom-left
-    ); 
+Widget _itemBox({required List<List> itemSet, required List item, required index, bool? isFrame}) {
+  Widget frameButton;
+  if(isFrame ?? false) {
+    frameButton = IconButton(
+      onPressed: () => _createDialog(context, npcFrame[index][0], 'NPC', npc),
+      icon: const Icon(Icons.add_circle_outline)
+    );
   }
   else {
-    side = BorderRadius.only(
-      topRight: Radius.circular(20.0), // top-right
-      bottomRight: Radius.circular(20.0), // bottom-right
-    );
-  } 
+    frameButton = SizedBox.shrink();
+  }
 
-  return Card(
-    shape: RoundedRectangleBorder(
-      borderRadius: side
-    ),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        ListTile(
-          leading: Icon(Icons.person_2_outlined),
-          title: Text('${info[0]}'),
-          subtitle: Text('${info[1]}'),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            TextButton(
-              child: const Text('Edit'),
-              onPressed: () {
-                _playerEditDialog(context, index);
-              },),
-              TextButton(
-              child: const Text('Delete'),
-              onPressed: () {
-                setState(() {
-                  players.removeAt(index);
-                });
-              },)
+  
+  return Padding(
+    padding: const EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
+    child: Container(
+      decoration: BoxDecoration(
+        
+        gradient: LinearGradient(colors: [Color.fromARGB(255, 45, 40, 55), Color.fromARGB(255, 70, 63, 85)], begin: Alignment.bottomCenter, end: Alignment.topCenter),
+        borderRadius: BorderRadius.all(Radius.circular(10))
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Stack(
+          children: [
+            frameButton,
+            Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: item.length-1,
+                itemBuilder: (context, index) {
+                  if(index == 0) {
+                    return Text('${item[index]}');
+                  }
+                  if(index.isOdd) {
+                    return Text('${item[index]}: ${item[index+1]}');
+                  }
+                  return SizedBox.shrink();
+                }
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  TextButton(
+                    child: const Text('Edit'),
+                    onPressed: () {
+                      _editDialog(context, itemSet, index);
+                    },),
+                    TextButton(
+                    child: const Text('Delete'),
+                    onPressed: () {
+                      setState(() {
+                        itemSet.removeAt(index);
+                      });
+                    },)
+                  ],
+                )
+              ]
+            ),
           ],
-        )
-      ]
-    )
+        ),
+      ),
+    ),
   );
 }
 
@@ -660,7 +530,7 @@ rooms.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), name:'Roo
                         shrinkWrap: true,
                         itemCount: players.length,
                         itemBuilder: (BuildContext context, int position) {
-                            return _characterBox(info: players[position] ?? '', index: position, orientedLeft: false);
+                            return _itemBox(itemSet: players, item: players[position], index: position);
                         }
                       ),
                     ),
@@ -735,50 +605,55 @@ rooms.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), name:'Roo
                             child: Clock(timeStream: _clockStream),
                           ),
                           SliverToBoxAdapter(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: BorderDirectional(bottom: BorderSide(color: Colors.green))
+                              ),
+                              child: Row(
+                                children: [
+                                  TextButton(
+                                    child: const Text('Edit'),
+                                    onPressed: () {
+                                      _timeDialog(context);
+                                    },),
+                                    TextButton(
+                                    child: const Text('Start'),
+                                    onPressed: () {
+                                      if(!clockState) {
+                                        clockState = true;
+                                      }
+                                      else {
+                                        clockState = false;
+                                      }
+                                    },),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SliverToBoxAdapter(
                             child: Row(
                               children: [
-                                TextButton(
-                                  child: const Text('Edit'),
-                                  onPressed: () {
-                                    _timeDialog(context);
-                                  },),
-                                  TextButton(
-                                  child: const Text('Start'),
-                                  onPressed: () {
-                                    if(!clockState) {
-                                      clockState = true;
-                                    }
-                                    else {
-                                      clockState = false;
-                                    }
-                                  },),
-                              ],
-                            ),
-                          ),
-                          SliverToBoxAdapter(
-                            child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Padding(
-                                padding: EdgeInsets.only(left: 10),
-                                child: Text('Monster Types')
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 10),
+                                    child: Text('Stat Blocks')
+                                  ),
+                                ),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () => _createDialog(context,'','',npcFrame),
+                                      child: const Text('Create new block'),
+                                    ),
+                                ),
+                                ],
                               )
                             ),
-                          ),
-                          SliverToBoxAdapter(
-                            child: Align(
-                            alignment: Alignment.topRight,
-                            child: ElevatedButton(
-                              onPressed: () => _createDialog(context,'','',npcFrame),
-                                child: const Text('Open Input Dialog'),
-                              )
-                            )
-                          ),
                             SliverToBoxAdapter(
                               child: ListView.builder(
                                 shrinkWrap: true,
                                 itemCount: npcFrame.length,
                                 itemBuilder: (BuildContext context, int position) {
-                                    return _npcFrameBox(info: npcFrame[position] ?? '', index: position);
+                                    return _itemBox(itemSet: npcFrame, item: npcFrame[position], index: position, isFrame: true);
                                 }
                               ),
                             ),
@@ -818,7 +693,7 @@ rooms.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), name:'Roo
                         shrinkWrap: true,
                         itemCount: npc.length,
                         itemBuilder: (BuildContext context, int position) {
-                            return _npcBox(info: npc[position] ?? '', index: position);
+                            return _itemBox(itemSet: npc, item: npc[position], index: position);
                         }
                       ),
                     ),
