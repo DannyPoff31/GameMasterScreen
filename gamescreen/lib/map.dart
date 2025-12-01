@@ -10,7 +10,7 @@ class map extends StatelessWidget {
   
   final List<Room> rooms;
 
-  void Function(BuildContext, String, String, List) callback;
+  final void Function(BuildContext, String, String, List) callback;
 
   map({
     required this.height,

@@ -177,7 +177,7 @@ final List<TextEditingController> _contentControllers = [];
 
   final List<TextEditingController> _editControllers = [];
   Widget _modularEditField(List item) {
-    for(int i = 0; i < item.length; i++) {
+    for(int i = 0; i < item.length-1; i++) {
       _editControllers.add(TextEditingController());
     }
 
@@ -193,18 +193,19 @@ final List<TextEditingController> _contentControllers = [];
                   shrinkWrap: true,
                   itemCount: _editControllers.length,
                   itemBuilder: (context, index) {
+                    print('Index $index');
                     if(index.isOdd) {
                       return Row(
                         children: [
                           Expanded(
                             child: TextField(
-                              controller: _editControllers[index],
+                              controller: _editControllers[index-1],
                               decoration: InputDecoration(hintText: item[index]),
                             ),
                           ),
                           Expanded(
                             child: TextField(
-                              controller: _editControllers[index+1],
+                              controller: _editControllers[index],
                               decoration: InputDecoration(hintText: item[index+1]),
                             ),
                           ),
@@ -381,13 +382,13 @@ final List<TextEditingController> _contentControllers = [];
             TextButton(
               child: const Text('Submit'),
               onPressed: () {
-                List submit = ['${_nameController.text}',];
-                for(int i = 0; i < _variableControllers.length; i++) {
-                  submit.add(_variableControllers[i].text);
-                  submit.add(_contentControllers[i].text);
+                List submit = ['${_nameController.text}'];
+
+                for(int i = 0; i < _editControllers.length; i++) {
+                  submit.add(_editControllers[i].text);
                 }
                 // Access the input value from _textController.text
-                itemSet.add(submit);
+                itemSet[index] = submit;
                 Navigator.of(context).pop(); // Close the dialog
                 setState(() {
                   
