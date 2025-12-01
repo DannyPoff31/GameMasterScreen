@@ -33,12 +33,8 @@ class map extends StatelessWidget {
           final offset = box.globalToLocal(event.position);
 
           if(offset.dx < endx && offset.dx > startx && offset.dy < endy && offset.dy > starty) {
-            print(rooms[i].name);
-            callback(context, 'Hello', rooms[i].name, rooms);
+            callback(context, rooms[i].info, rooms[i].name, rooms);
           } 
-        }
-        if(event.position.dx < 40 && event.position.dy-height! < 40) {
-          print('Click');
         }
       },
       child: SizedBox(

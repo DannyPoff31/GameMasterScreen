@@ -14,7 +14,7 @@ class mapDrawer extends CustomPainter {
   });
 
   @override
-  void paint(Canvas canvas, Size size) {
+  void paint(Canvas canvas, Size size,) {
     for(Sketch sketch in sketches) {
       final points = sketch.points;
       // nothing to draw
@@ -60,7 +60,6 @@ class mapDrawer extends CustomPainter {
         ..strokeWidth = sketch.size
         ..strokeCap = StrokeCap.round
         ..style = PaintingStyle.stroke;
-
       canvas.drawPath(path, paint);
     }
   }
@@ -99,20 +98,29 @@ class mapDrawingBoard extends StatelessWidget {
 
   Widget buildAllPaths() {
     return RepaintBoundary(
-      child: SizedBox(
-        height: height,
-        width: width,
-        // Rebuild the CustomPaint whenever the list of sketches changes
-        child: ValueListenableBuilder<List<Sketch>>(
-          valueListenable: allSketches,
-          builder: (context, sketchesValue, _) {
-            return CustomPaint(
-              painter: mapDrawer(
-                sketches: sketchesValue,
-                rooms: rooms,
-              ),
-            );
-          },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(12),
+          border: BoxBorder.all(
+            color: Colors.green,
+          )
+        ),
+        child: SizedBox(
+          height: height,
+          width: width,
+          // Rebuild the CustomPaint whenever the list of sketches changes
+          child: ValueListenableBuilder<List<Sketch>>(
+            valueListenable: allSketches,
+            builder: (context, sketchesValue, _) {
+              return CustomPaint(
+                painter: mapDrawer(
+                  sketches: sketchesValue,
+                  rooms: rooms,
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -126,7 +134,6 @@ class mapDrawingBoard extends StatelessWidget {
         final offset = box.globalToLocal(event.position);
 
         currentSketch.value = Sketch(points: [offset]);
-        print('Start: $offset');
         start = offset;
       } ,
       onPointerMove: (event) {

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:newproject/drawingTools/sketch.dart';
+import 'package:newproject/infoPopup.dart';
 import 'dart:async';
 import 'clock.dart';
-import 'mapDrawer.dart';
 import 'map.dart';
 import 'drawingTools/room.dart';
+import 'createMapPage.dart';
+import 'infoPopup.dart';
 
 
 void main() {
@@ -404,9 +406,9 @@ final List<TextEditingController> _contentControllers = [];
 Widget _itemBox({required List<List> itemSet, required List item, required index, bool? isFrame}) {
   Widget frameButton;
   if(isFrame ?? false) {
-    frameButton = IconButton(
+    frameButton = TextButton(
       onPressed: () => _createDialog(context, npcFrame[index][0], 'NPC', npc),
-      icon: const Icon(Icons.add_circle_outline)
+      child: Text('Instantiate'),
     );
   }
   else {
@@ -426,7 +428,6 @@ Widget _itemBox({required List<List> itemSet, required List item, required index
         padding: const EdgeInsets.all(8.0),
         child: Stack(
           children: [
-            frameButton,
             Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -462,6 +463,11 @@ Widget _itemBox({required List<List> itemSet, required List item, required index
                 )
               ]
             ),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: frameButton
+              ),
           ],
         ),
       ),
@@ -470,16 +476,12 @@ Widget _itemBox({required List<List> itemSet, required List item, required index
 }
 
 
-ValueNotifier<List<Sketch>> allSketches = ValueNotifier<List<Sketch>>([Sketch(points:[Offset(10, 10), Offset(15, 15), Offset(20, 20)]), Sketch(points:[Offset(40, 40), Offset(60, 60), Offset(80, 80)]), Sketch(points:[Offset(20, 100), Offset(21, 101), Offset(60, 120)])]);
+
+ValueNotifier<List<Sketch>> allSketches = ValueNotifier<List<Sketch>>([]);
 ValueNotifier<Sketch> currentSketch = ValueNotifier<Sketch>(Sketch(points: []));
 double? height = MediaQuery.of(context).size.height * .8;
 double? width = MediaQuery.of(context).size.width;
-List<Room> rooms = [ 
-  Room(startpoint: Offset(10,10), endpoint: Offset(20,20), name: 'Room1'),
-  Room(startpoint: Offset(40,40), endpoint: Offset(80,80), name: 'Room2'),
-];
-
-rooms.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), name:'Room3'));
+List<Room> rooms = [];
 
 // MAIN PAGE !!!
     return Scaffold(
@@ -492,50 +494,46 @@ rooms.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), name:'Roo
         )),
       ),
       drawer: Drawer(
-        child: Column(
-          children: [ Container(
-                    //constraints: BoxConstraints(minWidth: 100, maxWidth: 200),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.inversePrimary,
-                      borderRadius: BorderRadius.only(bottomRight: Radius.circular(10)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withValues(alpha: 0.75),
-                          spreadRadius: 1,
-                          blurRadius:  .5,
-                          offset: Offset(.5, 1), // changes position of shadow
-                        )
-                      ],
-                    ),
-                    child: Row( 
-                      children: [ 
-                        Expanded(
-                          flex: 2,
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Text('Player Characters')
-                          )
-                        ),
-                        Expanded(
-                          flex: 2, 
-                          child: ElevatedButton(
-                            onPressed: () {_createDialog(context,'Hello','Hello',players);},
-                              child: const Text('Create Player'),
-                            ),
-                          ),                        
-                      ],
-                      )
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: players.length,
-                        itemBuilder: (BuildContext context, int position) {
-                            return _itemBox(itemSet: players, item: players[position], index: position);
-                        }
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.black,
+          ),
+          child: Column(
+            children: [ Container(
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 45, 40, 55),
+                borderRadius: BorderRadius.only(bottomRight: Radius.circular(10)),
+              ),
+              child: Row( 
+                children: [ 
+                  Expanded(
+                    flex: 2,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Text('Player Characters', )
+                    )
+                  ),
+                  Expanded(
+                    flex: 2, 
+                    child: ElevatedButton(
+                      onPressed: () {_createDialog(context,'','',players);},
+                        child: const Text('Create Player'),
                       ),
-                    ),
-          ]
+                    ),                        
+                ],
+                )
+              ),
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: players.length,
+                  itemBuilder: (BuildContext context, int position) {
+                      return _itemBox(itemSet: players, item: players[position], index: position);
+                  }
+                ),
+              ),
+            ]
+          ),
         ),
       ),
 
@@ -558,7 +556,13 @@ rooms.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), name:'Roo
                             width: width,
                             rooms: rooms,
                             allSketches: allSketches,
-                            callback: _createDialog,
+                            callback: (context, title, roomName, roomsList) {
+                              showInfoPopup(
+                                context: context,
+                                title: 'Room: $roomName',
+                                content: '$title',
+                              );
+                            },
                           ),
                           Positioned(
                             top: 0,
@@ -568,7 +572,7 @@ rooms.add(Room(startpoint: Offset(20, 100), endpoint: Offset(60, 120), name:'Roo
                               child: ElevatedButton(onPressed: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute<void>(
-                                    builder: (context) => mapDrawingBoard(
+                                    builder: (context) => CreateMapPage(
                                       height: height, 
                                       width: width,
                                       currentSketch: currentSketch,
